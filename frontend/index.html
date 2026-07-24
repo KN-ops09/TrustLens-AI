@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TrustLens AI — Scam Message Detector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<div class="lens-bg" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">◎</span>
+    <span class="brand-name">TrustLens<span class="brand-ai">AI</span></span>
+  </div>
+  <div class="topbar-tag">Scam &amp; fraud message detector — built for Indian inboxes</div>
+</header>
+
+<main class="layout">
+
+  <section class="panel input-panel">
+    <h1>Paste the message you're unsure about.</h1>
+    <p class="sub">SMS, WhatsApp forward, email, job offer, investment pitch — TrustLens reads it the way a careful friend would.</p>
+
+    <textarea id="messageInput" placeholder="e.g. Congratulations! Aapka number KBC lottery mein select hua hai. Claim karne ke liye is link par click karein aur apna OTP share karein..."></textarea>
+
+    <div class="input-row">
+      <button id="analyzeBtn" class="analyze-btn">
+        <span class="btn-label">Scan message</span>
+        <span class="btn-glyph">→</span>
+      </button>
+      <span class="hint" id="charHint">0 characters</span>
+    </div>
+  </section>
+
+  <section class="panel trace-panel" id="tracePanel" hidden>
+    <div class="trace-head">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="trace-title">analysis.log</span>
+    </div>
+    <pre class="trace-body" id="traceBody"></pre>
+  </section>
+
+  <section class="panel result-panel" id="resultPanel" hidden>
+    <div class="gauge-wrap">
+      <svg id="gauge" viewBox="0 0 200 120" class="gauge">
+        <path class="gauge-track" d="M20 110 A80 80 0 0 1 180 110" />
+        <path class="gauge-fill" id="gaugeFill" d="M20 110 A80 80 0 0 1 180 110" />
+      </svg>
+      <div class="gauge-readout">
+        <span id="gaugeNumber">0</span><span class="gauge-percent">%</span>
+        <div class="gauge-caption">scam probability</div>
+      </div>
+    </div>
+
+    <div class="verdict">
+      <div class="verdict-category" id="verdictCategory">—</div>
+      <p class="verdict-explanation" id="verdictExplanation"></p>
+
+      <div class="flags" id="flagsList"></div>
+
+      <div class="action-box">
+        <span class="action-label">Recommended action</span>
+        <p id="recommendedAction"></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  Built with Vibe Coding · FastAPI + Claude · anonymized community pattern matching, no message text is ever stored
+</footer>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
