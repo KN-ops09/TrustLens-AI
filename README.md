@@ -183,6 +183,7 @@ https://trustlens-ai-2bbu.onrender.com
 👩‍💻 Author
 
 Karishma Narkhede
-Deepak Patil
+,Deepak Patil
+,Prerana Patil
 
 TrustLens AI — AI-powered Scam Detection System
