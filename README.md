@@ -1,128 +1,187 @@
-# TrustLens AI
+TrustLens AI
 
-AI-powered scam / fraud message detector built for Indian users — paste any suspicious
-SMS, WhatsApp forward, email, job offer, or investment pitch and get a live-streamed,
-explainable risk analysis.
+AI-powered scam and fraud message detector built for Indian users.
+TrustLens AI allows users to paste suspicious SMS, WhatsApp forwards, emails, job offers, or investment messages and receive a live, explainable risk analysis.
 
-Built as a **Vibe Coding** project: full-stack app, containerized, deployed on AWS.
+Built as a Vibe Coding project: a full-stack AI application, containerized with Docker, deployed on Render.
 
 ---
 
-## What it does
+🔗 Project Links
 
-1. User pastes a message into the UI.
-2. Backend extracts lightweight signal keywords (urgency words, OTP/KYC mentions, links,
-   phone numbers) and checks them against a small **community pattern store** — a
-   local JSON file of anonymized keyword/category records from previously analyzed
-   messages (no raw message text is ever stored).
-3. That context plus the message is sent to Claude with a structured system prompt.
-4. Claude streams back a short reasoning trace ("Checking urgency cues...",
-   "Cross-referencing known scam patterns...") followed by a fenced JSON verdict:
-   scam probability, category, red flags, plain-language explanation, and a
-   recommended action.
-5. The frontend renders the reasoning trace live (Server-Sent Events) and then
-   animates a risk gauge + red-flag chips once the verdict JSON arrives.
+GitHub Repository:
+https://github.com/KN-ops09/TrustLens-AI
 
-## Tech stack
+Live Demo:
+https://trustlens-ai-2bbu.onrender.com
 
-- **Frontend:** vanilla HTML/CSS/JS, Server-Sent Events for streaming, no build step
-- **Backend:** Python, FastAPI, Google `google-generativeai` SDK (Gemini, free tier, streaming)
-- **Storage:** flat JSON file for the anonymized community pattern store (Option A —
-  lightweight, no external DB required; upgradeable to a vector-based RAG store later)
-- **Container:** single Dockerfile, one process serves both API and static frontend
-- **Deployment target:** AWS App Runner or Elastic Beanstalk (free tier)
+---
 
-## Project structure
+🚀 What it does
 
-```
+1. User enters a suspicious message through the web interface.
+
+2. The backend extracts lightweight scam indicators such as:
+   
+   - Urgency words
+   - OTP/KYC mentions
+   - Suspicious links
+   - Phone numbers
+   - Scam-related keywords
+
+3. These signals are checked against a lightweight community pattern store containing anonymized scam patterns. No original user messages are stored.
+
+4. The message context is analyzed using the Groq API with Llama models through a structured AI prompt.
+
+5. The AI generates:
+   
+   - Scam probability score
+   - Scam category
+   - Red flags
+   - Simple explanation
+   - Recommended safety action
+
+6. The frontend displays the analysis with live reasoning updates, risk visualization, and warning indicators.
+
+---
+
+🛠️ Tech Stack
+
+Frontend
+
+- HTML
+- CSS
+- JavaScript
+- Server-Sent Events (SSE) for live streaming responses
+
+Backend
+
+- Python
+- FastAPI
+- Groq API (Llama model)
+- Groq Python SDK
+
+Storage
+
+- Local JSON-based community pattern store
+- Stores only anonymized keywords, categories, and probability information
+
+Containerization
+
+- Docker
+- Single container serving backend and frontend
+
+Deployment
+
+- Render (Free Tier)
+
+---
+
+📁 Project Structure
+
 trustlens-ai/
+│
 ├── backend/
-│   ├── main.py            # FastAPI app: streaming endpoint + pattern store
+│   ├── main.py                 # FastAPI backend and AI analysis logic
 │   ├── requirements.txt
 │   └── data/
-│       └── patterns.json  # anonymized keyword/category store (auto-created)
+│       └── patterns.json       # Anonymized scam pattern store
+│
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
 │   └── script.js
+│
 ├── Dockerfile
 ├── .env.example
 ├── .dockerignore
 ├── .gitignore
 └── README.md
-```
 
-## Run locally
+---
 
-```bash
-cd trustlens-ai
-cp .env.example .env
-# edit .env and paste your GEMINI_API_KEY (get one free at https://aistudio.google.com/apikey)
+💻 Run Locally
+
+1. Clone the repository
+
+git clone https://github.com/KN-ops09/TrustLens-AI.git
+
+2. Configure environment variables
+
+Create a ".env" file:
+
+GROQ_API_KEY=your_groq_api_key
+
+3. Install dependencies
 
 cd backend
 pip install -r requirements.txt
+
+4. Start FastAPI server
+
 uvicorn main:app --reload --port 8000
-```
 
-Open http://localhost:8000
+Open:
 
-## Run with Docker
+http://localhost:8000
 
-```bash
-cd trustlens-ai
+---
+
+🐳 Run Using Docker
+
+Build the Docker image:
+
 docker build -t trustlens-ai .
+
+Run the container:
+
 docker run -p 8000:8000 --env-file .env trustlens-ai
-```
 
-Open http://localhost:8000
+Open:
 
-## Deploying to AWS
+http://localhost:8000
 
-### Option A — AWS App Runner (recommended, simplest)
+---
 
-1. Push this repo to GitHub (make sure `.env` is **not** committed — it's already in
-   `.gitignore`).
-2. In the AWS Console, open **App Runner → Create service**.
-3. Source: **Source code repository** → connect your GitHub repo, or
-   **Container registry** if you push the image to Amazon ECR first:
-   ```bash
-   aws ecr create-repository --repository-name trustlens-ai
-   aws ecr get-login-password | docker login --username AWS --password-stdin <account>.dkr.ecr.<region>.amazonaws.com
-   docker tag trustlens-ai:latest <account>.dkr.ecr.<region>.amazonaws.com/trustlens-ai:latest
-   docker push <account>.dkr.ecr.<region>.amazonaws.com/trustlens-ai:latest
-   ```
-4. Set the port to `8000`.
-5. Under **Environment variables**, add `GEMINI_API_KEY` (and optionally
-   `GEMINI_MODEL`) — never hardcode the key in the image or repo.
-6. Deploy. App Runner gives you a public HTTPS URL — paste that into your Concept
-   Note and Project Report.
-7. Set up an **AWS Budget alert** (Billing → Budgets) so free-tier usage doesn't
-   surprise you.
+☁️ Deployment
 
-### Option B — Elastic Beanstalk (Docker platform)
+TrustLens AI is deployed using Render.
 
-1. `eb init -p docker trustlens-ai`
-2. `eb create trustlens-env`
-3. In the EB console, set `GEMINI_API_KEY` under
-   **Configuration → Software → Environment properties**.
-4. `eb deploy`
-5. EB gives you a public HTTPS URL once you attach a certificate / use the default
-   EB domain.
+Deployment process:
 
-## Security notes
+1. Repository connected with GitHub.
+2. Docker-based deployment configured.
+3. Environment variable "GROQ_API_KEY" added securely.
+4. Application deployed as a public web service.
 
-- The API key lives only in the environment (`.env` locally, platform environment
-  variables in AWS) — it's never referenced from `frontend/script.js` or committed
-  to version control.
-- The community pattern store persists only extracted keywords, a category label,
-  and a probability score — never the original message text.
+Live application:
 
-## Possible extensions (documented as future scope)
+https://trustlens-ai-2bbu.onrender.com
 
-- Swap the keyword-overlap pattern store for real embeddings + a vector index
-  (proper RAG) for semantic similarity instead of keyword overlap.
-- Add a lightweight regex/rule-based pre-filter as a fast first pass before the
-  LLM call, to cut latency and cost on obviously benign messages.
-- Persist the community store in a managed DB (DynamoDB) instead of a flat file
-  once deployed with more than one instance, since local JSON won't be shared
-  across App Runner replicas.
+---
+
+🔒 Security Notes
+
+- API keys are stored only as environment variables.
+- No API key is exposed in frontend files.
+- ".env" files are ignored using ".gitignore".
+- User messages are not permanently stored.
+- Community pattern storage contains only anonymized scam indicators.
+
+---
+
+🔮 Future Enhancements
+
+- Replace keyword-based pattern matching with vector embeddings and advanced RAG.
+- Add database storage for scalable community pattern management.
+- Add multilingual scam detection for Indian regional languages.
+- Add browser extension support for real-time scam detection.
+- Add advanced fraud intelligence using larger AI models.
+
+---
+
+👩‍💻 Author
+
+Karishma Narkhede
+
+TrustLens AI — AI-powered Scam Detection System
